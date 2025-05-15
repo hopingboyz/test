@@ -31,8 +31,10 @@ RUN mkdir -p /novnc && \
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-# Start VM without KVM (use TCG fallback)\n\
+# Start VM with KVM acceleration (requires --device /dev/kvm)\n\
 qemu-system-x86_64 \\\n\
+  -enable-kvm \\\n\
+  -cpu host \\\n\
   -m 2048 \\\n\
   -smp 2 \\\n\
   -vga virtio \\\n\
