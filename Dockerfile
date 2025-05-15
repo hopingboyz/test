@@ -13,7 +13,7 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Download Debian 10.13 netinst ISO
-RUN wget -q https://archive.debian.org/debian-cd/10.13.0/amd64/iso-cd/debian-10.13.0-amd64-netinst.iso -O /debian.iso && \
+RUN wget -q https://archive.debian.org/debian/dists/buster/main/installer-amd64/current/images/netboot/mini.iso -O /debian.iso && \
     [ -s /debian.iso ] || { echo "ISO download failed"; exit 1; }
 
 # Create startup script (non-KVM version)
