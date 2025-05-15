@@ -14,19 +14,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Download Ubuntu Server ISO
+# Download Ubuntu Server ISO (Live Installer)
 RUN wget -q https://cdimage.ubuntu.com/ubuntu-server/noble/daily-live/current/noble-live-server-amd64.iso -O /ubuntu.iso
 
-# Create blank VM disk
+# Create blank disk
 RUN qemu-img create -f qcow2 /disk.qcow2 20G
 
-# Startup script
+# Add noVNC Web UI
+RUN mkdir -p /novnc && \
+    wget -qO- https://github.com/novnc/noVNC/archive/refs/heads/master.zip | bsdtar -xvf- -C /novnc --strip-components=1
+
+# Start script
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
+# Start VM without KVM (using TCG)\n\
 qemu-system-x86_64 \\\n\
-  -enable-kvm \\\n\
-  -m 4096 \\\n\
+  -m 2048 \\\n\
   -smp 2 \\\n\
   -vga virtio \\\n\
   -cdrom /ubuntu.iso \\\n\
@@ -36,14 +40,13 @@ qemu-system-x86_64 \\\n\
   -vnc :0 &\n\
 \n\
 sleep 5\n\
-websockify --web /usr/share/novnc/ 6080 localhost:5900 &\n\
+websockify --web /novnc 6080 localhost:5900 &\n\
 \n\
 echo "================================================"\n\
-echo " 🖥️  Access the installer: http://localhost:6080"\n\
-echo " 🔧 Proceed with full Ubuntu install"\n\
-echo " ✅ Set your own username and password manually"\n\
+echo " 🖥️  Open http://localhost:6080 to access the VM GUI"\n\
+echo " 🔧 Complete the Ubuntu Server installation manually"\n\
+echo " ✅ Set your own username and password"\n\
 echo "================================================"\n\
-\n\
 tail -f /dev/null\n' > /start.sh && chmod +x /start.sh
 
 EXPOSE 6080 2222
