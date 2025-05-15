@@ -20,15 +20,18 @@ RUN wget -q https://cdimage.ubuntu.com/ubuntu-server/noble/daily-live/current/no
 # Create blank disk
 RUN qemu-img create -f qcow2 /disk.qcow2 20G
 
-# Add noVNC Web UI
+# Add noVNC Web UI (use unzip instead of bsdtar)
 RUN mkdir -p /novnc && \
-    wget -qO- https://github.com/novnc/noVNC/archive/refs/heads/master.zip | bsdtar -xvf- -C /novnc --strip-components=1
+    wget https://github.com/novnc/noVNC/archive/refs/heads/master.zip -O /tmp/novnc.zip && \
+    unzip /tmp/novnc.zip -d /tmp && \
+    mv /tmp/noVNC-master/* /novnc && \
+    rm -rf /tmp/novnc.zip /tmp/noVNC-master
 
 # Start script
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
-# Start VM without KVM (using TCG)\n\
+# Start VM without KVM (use TCG fallback)\n\
 qemu-system-x86_64 \\\n\
   -m 2048 \\\n\
   -smp 2 \\\n\
