@@ -44,7 +44,7 @@ qemu-system-x86_64 \\\n\
   -enable-kvm \\\n\
   -cpu host \\\n\
   -m 6144 \\\n\
-  -smp 2 \\\n\
+  -smp 4 \\\n\
   -vga virtio \\\n\
   -cdrom /ubuntu.iso \\\n\
   -drive file=/data/disk.qcow2,format=qcow2,if=virtio \\\n\
